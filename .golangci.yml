@@ -1,0 +1,86 @@
+# golangci-lint configuration
+# See https://golangci-lint.run/usage/configuration/ for more options
+
+version: 2
+
+run:
+  timeout: 5m
+  tests: true
+  skip-dirs:
+    - bin
+    - vendor
+    - migrations
+    - docs
+  skip-files:
+    - ".*\\.pb\\.go$"
+    - ".*\\.gen\\.go$"
+    - "^docs/docs\\.go$"
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  funlen:
+    lines: 250
+    statements: 150
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+  goconst:
+    min-len: 3
+    min-occurrences: 2
+  gocognit:
+    min-complexity: 15
+  govet:
+    check-shadowing: true
+  lll:
+    line-length: 140
+    tab-width: 1
+  gochecknoinits:
+    # Allow init functions in generated docs
+    allow-init-in-main: false
+  misspell:
+    locale: US
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - govet
+    - ineffassign
+    - lll
+    - misspell
+    - staticcheck
+    - unconvert
+    - unparam
+    - unused
+    - whitespace
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - funlen
+        - goconst
+        - gocritic
+        - gocyclo
+        - lll
+    - path: tests/.*
+      linters:
+        - funlen
+    - text: "docs/docs.go"
+      linters:
+        - gochecknoinits
+        - lll
+        - goconst
+  max-issues-per-linter: 0
+  max-same-issues: 0

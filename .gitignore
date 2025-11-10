@@ -1,0 +1,102 @@
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/api
+api.exe
+
+# Test files
+*.test
+*.out
+coverage.out
+coverage.html
+
+# Environment files
+.env
+.env.local
+.env.*.local
+# Keep .env.example for reference
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Swagger generated docs (optional - can be committed)
+# docs/swagger.json
+# docs/swagger.yaml
+# docs/docs.go
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Air live reload
+tmp/
+build-errors.log
+
+# HTTP Client (REST Client, etc.)
+.http-client.env.json
+*.http-client.env.json
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Dependency directories (if using vendor)
+vendor/
+
+# Profiling data
+*.prof
+*.pprof
+
+# Coverage reports (already covered but explicit)
+coverage.out
+coverage.html
+*.coverprofile
+
+# Build artifacts
+/bin/
+/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+# Binary name (only at root level, not directories like cmd/api)
+/api
+api.exe
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

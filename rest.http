@@ -1,0 +1,190 @@
+### Variables
+@baseUrl = http://127.0.0.1:8080
+
+# Note: Tokens are auto-extracted from login responses below
+# If auto-extraction doesn't work, manually copy the token from login response
+# and paste it here:
+# @token = YOUR_JWT_TOKEN_HERE
+# @adminToken = YOUR_ADMIN_JWT_TOKEN_HERE
+
+# User ID - Replace with actual user ID from GET /api/users response
+@userId = YOUR_USER_ID_HERE
+
+###############################################
+# PUBLIC ENDPOINTS (No Authentication Required)
+###############################################
+
+### Health Check
+GET {{baseUrl}}/api/health
+
+### Register User
+# Creates a new user account (default role: "user")
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "password": "securePassword123",
+    "full_name": "John Doe"
+}
+
+### Login (Regular User)
+# Auto-extracts token to @token variable for use in subsequent requests
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "user@example.com",
+    "password": "securePassword123"
+}
+
+### Extract token from login response
+# REST Client automatically extracts the token from the login response above
+@token = {{login.response.body.token}}
+
+### Login as Admin
+# Use this if you have an admin account
+# Auto-extracts admin token to @adminToken variable
+# @name adminLogin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+   "email": "user@example.com",
+    "password": "securePassword123"
+}
+
+### Extract admin token from login response
+@adminToken = {{adminLogin.response.body.token}}
+
+### Request Password Reset
+# Generates a password reset token (check server logs for the token)
+# In production, this would send an email with the reset link
+POST {{baseUrl}}/api/auth/request-password-reset
+Content-Type: application/json
+
+{
+    "email": "user@example.com"
+}
+
+### Reset Password
+# Use the reset token from server logs (or email in production)
+POST {{baseUrl}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+    "token": "reset-token-from-server-logs-or-email",
+    "password": "newSecurePassword123"
+}
+
+###############################################
+# PROTECTED ENDPOINTS (Require JWT Token)
+###############################################
+# All endpoints below require a valid JWT token in the Authorization header
+# Run the "Login" request above first to get a token
+
+### Change Password
+# Change password for the authenticated user
+POST {{baseUrl}}/api/auth/change-password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "current_password": "securePassword123",
+    "new_password": "newSecurePassword123"
+}
+
+### Get My Profile
+# Get the authenticated user's own profile
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{token}}
+
+### Get User by ID (Owner or Admin)
+# Get a specific user by their UUID
+# Users can only access their own profile, admins can access any
+# Replace {{userId}} with the user ID (must be your own ID unless you're admin)
+GET {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{token}}
+
+### Update User (Owner or Admin)
+# Update a user's email and full name
+# Users can only update their own profile, admins can update any
+# Replace {{userId}} with the user ID (must be your own ID unless you're admin)
+PUT {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "email": "updated@example.com",
+    "full_name": "Updated Name"
+}
+
+###############################################
+# ADMIN-ONLY ENDPOINTS (Require Admin Role)
+###############################################
+# These endpoints require a JWT token from a user with "admin" role
+# Admins have full control over all user operations
+
+### Make First Admin User (Database Query)
+# Since updating roles requires admin access, make your first admin via database:
+# 
+# Using psql:
+#   psql "postgresql://postgres:postgres@localhost:5434/go_api_starter?sslmode=disable" \
+#     -c "UPDATE users SET role = 'admin' WHERE email = 'user@example.com';"
+#
+# Or using pgAdmin/SQL client:
+#   UPDATE users SET role = 'admin' WHERE email = 'user@example.com';
+#
+# Then login again with that user to get a new token with admin role
+
+### Get All Users (Admin Only)
+# Returns a list of all users (paginated, default limit: 10)
+# Only admins can see all users - regular users should use GET /api/users/me
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{adminToken}}
+
+### Get Users with Pagination (Admin Only)
+# Get users with custom pagination
+GET {{baseUrl}}/api/users?limit=5&offset=0
+Authorization: Bearer {{adminToken}}
+
+### Create User (Admin Only)
+# Only admins can create new users via API
+POST {{baseUrl}}/api/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "email": "newuser@example.com",
+    "password": "securePassword123",
+    "full_name": "New User"
+}
+
+### Delete User (Admin Only)
+# Delete a user by ID
+# Replace {{userId}} with the user ID you want to delete
+DELETE {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Update User Role (Admin Only)
+# Change a user's role between "user" and "admin"
+# Replace {{userId}} with the user ID you want to update
+# 
+# Step 1: Make your first admin via database (see "Make First Admin User" above)
+# Step 2: Login as admin to get {{adminToken}}
+# Step 3: Use this endpoint to make other users admin
+PUT {{baseUrl}}/api/users/{{userId}}/role
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "role": "admin"
+}
+
+###############################################
+# SWAGGER DOCUMENTATION
+###############################################
+
+### Swagger UI
+GET {{baseUrl}}/swagger/index.html

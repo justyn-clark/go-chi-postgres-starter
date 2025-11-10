@@ -1,0 +1,43 @@
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+docs/*.md
+!docs/swagger.json
+!docs/swagger.yaml
+!docs/docs.go
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+bin/
+*.exe
+*.test
+*.out
+api
+
+# Environment files
+.env
+.env.local
+
+# Logs
+*.log
+
+# Tests
+coverage.out
+coverage.html
+tests/
+
+# Migrations (keep these - needed for runtime migrations)
+# migrations/
+

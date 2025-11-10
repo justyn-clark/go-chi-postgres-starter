@@ -1,0 +1,45 @@
+name: go-api-starter
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: go-api-starter-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: go_api_starter
+    ports:
+      - "5434:5432"  # Changed to 5434 to avoid conflict with local PostgreSQL 18
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-api-starter-api
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/go_api_starter?sslmode=disable
+      # Note: When using Docker, the API connects to postgres service on port 5432 (internal)
+      # External access to database is on localhost:5434
+      JWT_SECRET: dev-secret-change-in-production
+      PORT: 8080
+      ENVIRONMENT: development
+      LOG_LEVEL: info
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Note: Run migrations before starting the API
+    # docker compose exec api sh -c "migrate -path migrations -database \$DATABASE_URL up"
+    command: sh -c "sleep 2 && ./api"
+
+volumes:
+  postgres_data:
+
