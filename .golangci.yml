@@ -6,15 +6,6 @@ version: 2
 run:
   timeout: 5m
   tests: true
-  skip-dirs:
-    - bin
-    - vendor
-    - migrations
-    - docs
-  skip-files:
-    - ".*\\.pb\\.go$"
-    - ".*\\.gen\\.go$"
-    - "^docs/docs\\.go$"
 
 linters-settings:
   errcheck:
@@ -35,8 +26,6 @@ linters-settings:
     min-occurrences: 2
   gocognit:
     min-complexity: 15
-  govet:
-    check-shadowing: true
   lll:
     line-length: 140
     tab-width: 1
@@ -65,6 +54,15 @@ linters:
     - whitespace
 
 issues:
+  exclude-dirs:
+    - bin
+    - vendor
+    - migrations
+    - docs
+  exclude-files:
+    - ".*\\.pb\\.go$"
+    - ".*\\.gen\\.go$"
+    - "^docs/docs\\.go$"
   exclude-rules:
     - path: _test\.go
       linters:

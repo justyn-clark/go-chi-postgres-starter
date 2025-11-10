@@ -18,10 +18,12 @@ A clean, minimal Go REST API starter template with:
 
 ## Features
 
-![CI](https://github.com/yourusername/go-chi-postgres-starter/workflows/CI/badge.svg)
+![CI](https://github.com/justyn-clark/go-chi-postgres-starter/workflows/CI/badge.svg)
 ![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
 ![Go Version](https://img.shields.io/badge/go-1.25+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
+
+> **Note for template users:** After forking this repository, update the CI badge URL above (line 22) to point to your repository: `https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/workflows/CI/badge.svg`
 
 * ✅ **Production Ready** - Complete CI/CD pipeline with GitHub Actions
 * ✅ **Type Safe** - Full Go type safety and validation
@@ -74,6 +76,14 @@ psql --version  # Should show PostgreSQL 18.x or higher
 ```
 
 ## Quick start
+
+### 0) After Forking/Cloning (First Time Setup)
+
+If you've forked or cloned this template, update these placeholders:
+
+1. **Update module name in `go.mod`**: Change `github.com/yourusername/go-api-starter` to your module path
+2. **Update CI badge in `README.md`**: Replace `justyn-clark/go-chi-postgres-starter` in the CI badge URL (line 22) with your GitHub username and repo name
+3. **Search and replace**: Use your IDE's find/replace to update `yourusername` → `your-github-username` throughout the codebase
 
 ### 1) Clone and setup
 
@@ -340,12 +350,13 @@ utils.PeriodicTask(ctx, func() error {
 ```
 
 **Common Use Cases:**
-- **BackgroundTask**: Welcome emails, audit logging, webhooks
-- **BackgroundTaskWithRetry**: Payments, critical notifications, external API sync
-- **ProcessConcurrently**: Bulk imports, mass emails, report generation
-- **PeriodicTask**: Token cleanup, daily reports, health checks
-- **WaitGroupWithTimeout**: Coordinating multiple API calls
-- **FanOutFanIn**: Parallel processing with result collection
+
+* **BackgroundTask**: Welcome emails, audit logging, webhooks
+* **BackgroundTaskWithRetry**: Payments, critical notifications, external API sync
+* **ProcessConcurrently**: Bulk imports, mass emails, report generation
+* **PeriodicTask**: Token cleanup, daily reports, health checks
+* **WaitGroupWithTimeout**: Coordinating multiple API calls
+* **FanOutFanIn**: Parallel processing with result collection
 
 See [Goroutines Guide](./docs/GOROUTINES.md) for complete documentation and examples.
 
