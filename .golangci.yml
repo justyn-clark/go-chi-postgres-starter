@@ -75,7 +75,7 @@ issues:
     - path: tests/.*
       linters:
         - funlen
-    - text: "docs/docs.go"
+    - path: docs/docs\.go
       linters:
         - gochecknoinits
         - lll
