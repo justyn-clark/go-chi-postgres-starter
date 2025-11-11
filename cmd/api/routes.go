@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/yourusername/go-api-starter/cmd/api/database"
 	"github.com/yourusername/go-api-starter/cmd/api/handlers"
@@ -25,6 +26,8 @@ func SetupRoutes(db *database.DB, cfg *Config) *chi.Mux {
 	router.Use(chiMiddleware.RequestID)                 // Add request ID
 	router.Use(chiMiddleware.RealIP)                    // Get real IP from X-Forwarded-For
 	router.Use(middleware.SecurityHeaders)              // Security headers (X-Frame-Options, CSP, etc.)
+	router.Use(middleware.BodyLimit(1 << 20))           // Limit request body to 1MB (DoS protection)
+	router.Use(middleware.Metrics)                      // Prometheus metrics collection
 	router.Use(middleware.SimpleRequestLogger)          // Structured request logging
 	router.Use(middleware.Recoverer)                    // Panic recovery with stack traces
 	router.Use(chiMiddleware.Compress(5))               // Response compression
@@ -39,8 +42,19 @@ func SetupRoutes(db *database.DB, cfg *Config) *chi.Mux {
 	// }
 	// router.Use(middleware.CORS(corsConfig))
 
-	// Optional: Rate limiting (uncomment to enable)
-	// router.Use(chiMiddleware.Throttle(100)) // 100 requests per minute
+	// Rate limiting (enabled by default, configurable via RATE_LIMIT_ENABLED)
+	// Uses token bucket algorithm: allows bursts up to Burst size, then enforces
+	// RequestsPerSecond average rate. Each IP gets its own limiter.
+	// See middleware/ratelimit.go for detailed implementation notes.
+	if cfg.RateLimitEnabled {
+		rateLimitConfig := &middleware.RateLimiterConfig{
+			RequestsPerSecond: cfg.RateLimitRequestsPerSec,
+			Burst:             cfg.RateLimitBurst,
+			CleanupInterval:   5 * time.Minute,
+			MaxIPs:            10000,
+		}
+		router.Use(middleware.RateLimit(rateLimitConfig))
+	}
 
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db.Pool)
@@ -59,17 +73,35 @@ func SetupRoutes(db *database.DB, cfg *Config) *chi.Mux {
 	// Future:  /api/v2/... (add version routing)
 	router.Route("/api", func(r chi.Router) {
 		// Apply JWT auth to all routes (public routes are excluded in the middleware)
+		// NOTE: Middleware must be defined BEFORE routes in Chi
 		r.Use(middleware.JWTAuth(userService, cfg.APIAccessToken))
 
-		// Public endpoints (no auth required - defined in middleware/auth.go)
+		// Health endpoint (public, no auth required - excluded in middleware/auth.go)
 		r.Get("/health", healthHandler.Health)
-		r.Post("/auth/register", authHandler.Register)
-		r.Post("/auth/login", authHandler.Login)
-		r.Post("/auth/request-password-reset", authHandler.RequestPasswordReset)
-		r.Post("/auth/reset-password", authHandler.ResetPassword)
 
-		// Protected endpoints (require JWT Bearer token)
+		// Auth endpoints (public and protected)
+		// Apply stricter rate limiting to auth endpoints to prevent brute force attacks.
+		// Auth endpoints use HALF the normal rate limit (e.g., 5 req/sec vs 10 req/sec)
+		// to make brute force attacks slower and more detectable.
 		r.Route("/auth", func(r chi.Router) {
+			// Stricter rate limit for authentication endpoints
+			if cfg.RateLimitEnabled {
+				strictConfig := &middleware.RateLimiterConfig{
+					RequestsPerSecond: cfg.RateLimitRequestsPerSec / 2, // Half the normal rate
+					Burst:             cfg.RateLimitBurst / 2,
+					CleanupInterval:   5 * time.Minute,
+					MaxIPs:            10000,
+				}
+				r.Use(middleware.RateLimit(strictConfig))
+			}
+
+			// Public auth endpoints (no auth required - excluded in middleware/auth.go)
+			r.Post("/register", authHandler.Register)
+			r.Post("/login", authHandler.Login)
+			r.Post("/request-password-reset", authHandler.RequestPasswordReset)
+			r.Post("/reset-password", authHandler.ResetPassword)
+
+			// Protected auth endpoints (require JWT Bearer token)
 			r.Post("/change-password", authHandler.ChangePassword)
 		})
 
@@ -122,6 +154,9 @@ func SetupRoutes(db *database.DB, cfg *Config) *chi.Mux {
 	//   utils.PeriodicTask(ctx, func() error {
 	//       return cleanupExpiredTokens()
 	//   }, 1*time.Hour)
+
+	// Prometheus metrics endpoint (public, no auth required)
+	router.Get("/metrics", promhttp.Handler().ServeHTTP)
 
 	// Swagger UI - dynamically determine URL from request
 	router.Get("/swagger/*", func(w http.ResponseWriter, r *http.Request) {

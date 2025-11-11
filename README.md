@@ -35,7 +35,11 @@ A clean, minimal Go REST API starter template with:
 * ✅ **OpenAPI Documentation** - Auto-generated Swagger UI
 * ✅ **Testing Setup** - Comprehensive test configuration
 * ✅ **Built-in Utilities** - Pagination, validation, context helpers, custom errors, goroutines patterns
-* ✅ **Optional Middleware** - CORS, rate limiting (ready to enable)
+* ✅ **Rate Limiting** - IP-based rate limiting with token bucket algorithm (enabled by default)
+* ✅ **Request Body Limits** - 1MB body size limit (DoS protection)
+* ✅ **Prometheus Metrics** - `/metrics` endpoint for observability
+* ✅ **Database Pool Config** - Production-ready connection pool settings
+* ✅ **Optional Middleware** - CORS (ready to enable)
 * ✅ **Enhanced Health Checks** - Database status monitoring
 * ✅ **Extensible** - Easy to adapt for GraphQL, gRPC, microservices, CLI tools
 
@@ -164,6 +168,11 @@ JWT_SECRET=your-very-secure-random-secret-key-here
 PORT=8080
 ENVIRONMENT=development
 LOG_LEVEL=info
+
+# Rate Limiting (enabled by default)
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_REQUESTS_PER_SEC=10.0
+RATE_LIMIT_BURST=20
 ```
 
 **Note:** You can also set these as environment variables instead of using a `.env` file. See `.env.example` for all available configuration options.
@@ -363,7 +372,6 @@ See [Goroutines Guide](./docs/GOROUTINES.md) for complete documentation and exam
 ### Optional Middleware (Ready to Enable)
 
 **CORS** (`cmd/api/middleware/cors.go`) - Uncomment in `routes.go` to enable
-**Rate Limiting** - Uncomment in `routes.go` to enable
 
 ## Development Commands
 

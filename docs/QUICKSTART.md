@@ -81,7 +81,7 @@ curl http://localhost:8080/api/users \
 
 ## View API Documentation
 
-Open http://localhost:8080/swagger/index.html in your browser.
+Open <http://localhost:8080/swagger/index.html> in your browser.
 
 ## Using Docker Instead
 
@@ -104,4 +104,3 @@ That's it! Your API is running. 🚀
 - Read [Architecture](./ARCHITECTURE.md) to understand the codebase
 - Read [Setup Guide](./SETUP.md) for detailed setup instructions
 - Check [Contributing](../CONTRIBUTING.md) for development guidelines
-

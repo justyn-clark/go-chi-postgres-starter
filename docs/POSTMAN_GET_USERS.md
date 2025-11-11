@@ -30,12 +30,12 @@ The `GET /api/users` endpoint requires authentication. Here are two ways to call
 2. **Go to Authorization tab:**
    - Type: Select **"Bearer Token"**
    - Token: Paste your JWT token (without "Bearer")
-
+‰
 3. **Send the request**
 
 ### Example with Query Parameters
 
-```
+```text
 GET http://localhost:8080/api/users?limit=20&offset=0
 Authorization: Bearer <your-jwt-token>
 ```
@@ -67,7 +67,7 @@ go run ./cmd/api
 
 ### Example
 
-```
+```text
 GET http://localhost:8080/api/users?limit=10&offset=0
 X-API-Token: my-secret-token
 ```
@@ -83,7 +83,7 @@ Both methods support pagination:
 
 ### Examples
 
-```
+```text
 GET /api/users                    # First 10 users
 GET /api/users?limit=20           # First 20 users
 GET /api/users?limit=10&offset=10 # Users 11-20

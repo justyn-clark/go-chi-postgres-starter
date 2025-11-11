@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -21,6 +22,11 @@ type Config struct {
 
 	// Optional: API Access Token (for service-to-service auth)
 	APIAccessToken string
+
+	// Rate Limiting
+	RateLimitEnabled        bool
+	RateLimitRequestsPerSec float64
+	RateLimitBurst          int
 }
 
 // LoadConfig loads configuration from environment variables with validation
@@ -50,6 +56,11 @@ func LoadConfig() (*Config, error) {
 	// API Access Token (optional - for service-to-service auth without login)
 	cfg.APIAccessToken = getEnv("API_ACCESS_TOKEN", "")
 
+	// Rate Limiting (enabled by default in production)
+	cfg.RateLimitEnabled = getEnv("RATE_LIMIT_ENABLED", "true") == "true"
+	cfg.RateLimitRequestsPerSec = parseFloat(getEnv("RATE_LIMIT_REQUESTS_PER_SEC", "10.0"), 10.0)
+	cfg.RateLimitBurst = parseInt(getEnv("RATE_LIMIT_BURST", "20"), 20)
+
 	return cfg, nil
 }
 
@@ -65,4 +76,22 @@ func getEnv(key, defaultValue string) string {
 // getEnvRequired gets a required environment variable or returns empty string
 func getEnvRequired(key string) string {
 	return strings.TrimSpace(os.Getenv(key))
+}
+
+// parseInt parses an integer from a string, returning defaultValue on error
+func parseInt(s string, defaultValue int) int {
+	val, err := strconv.Atoi(s)
+	if err != nil {
+		return defaultValue
+	}
+	return val
+}
+
+// parseFloat parses a float from a string, returning defaultValue on error
+func parseFloat(s string, defaultValue float64) float64 {
+	val, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return defaultValue
+	}
+	return val
 }

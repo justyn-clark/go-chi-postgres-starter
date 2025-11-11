@@ -7,10 +7,12 @@ This starter includes comprehensive integration tests for all API endpoints.
 All API endpoints are tested:
 
 ### Health Endpoint
+
 - ✅ Health check returns OK status
 - ✅ Database health monitoring
 
 ### Authentication Endpoints
+
 - ✅ Register new user
 - ✅ Register duplicate email (conflict handling)
 - ✅ Register with invalid data (validation)
@@ -18,6 +20,7 @@ All API endpoints are tested:
 - ✅ Login with invalid credentials
 
 ### User Management Endpoints
+
 - ✅ List users (requires authentication)
 - ✅ List users with pagination
 - ✅ Get user by ID (requires authentication)
@@ -32,11 +35,13 @@ All API endpoints are tested:
 ### Prerequisites
 
 1. **Test Database**: Create a test database
+
    ```bash
    createdb go_api_starter_test
    ```
 
 2. **Run Migrations**: Apply migrations to test database
+
    ```bash
    export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/go_api_starter_test?sslmode=disable"
    make migrate-up
@@ -95,6 +100,7 @@ Tests are organized in `tests/api_test.go`:
 ## Test Features
 
 ### Table-Driven Tests
+
 Tests use table-driven patterns for multiple scenarios:
 
 ```go
@@ -108,13 +114,17 @@ testCases := []struct {
 ```
 
 ### Authentication Testing
+
 Tests verify:
+
 - JWT token generation on login
 - Token validation on protected routes
 - Unauthorized access rejection
 
 ### Error Handling
+
 Tests verify proper HTTP status codes:
+
 - `200` - Success
 - `201` - Created
 - `400` - Bad Request (validation errors)
@@ -123,6 +133,7 @@ Tests verify proper HTTP status codes:
 - `409` - Conflict (duplicate resources)
 
 ### Data Cleanup
+
 Tests clean up data using `TRUNCATE` to ensure isolation between test runs.
 
 ## CI/CD Integration
@@ -193,4 +204,3 @@ If tests interfere with each other:
 1. Ensure `teardownTest()` is called in each test
 2. Use unique test data (unique emails, IDs)
 3. Consider using database transactions for better isolation
-

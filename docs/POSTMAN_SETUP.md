@@ -26,7 +26,7 @@
 
 ### Step 2: Set Token in Postman
 
-**Option A: Bearer Token (Recommended)**
+#### Option A: Bearer Token (Recommended)
 
 1. In Postman, select your request
 2. Go to **Authorization** tab
@@ -34,7 +34,7 @@
 4. Paste your token in the **Token** field
 5. Postman automatically adds `Authorization: Bearer <token>` header
 
-**Option B: Manual Header**
+#### Option B: Manual Header
 
 1. Go to **Headers** tab
 2. Add header:
@@ -45,14 +45,14 @@
 
 #### "Invalid or expired token"
 
-**Causes:**
+##### Causes
 
 1. **Token expired** - Tokens expire after 7 days. Get a fresh token.
 2. **JWT_SECRET mismatch** - Server restarted with different secret
 3. **Wrong format** - Missing "Bearer " prefix or extra spaces
 4. **Old token** - Token from previous server instance
 
-**Solutions:**
+##### Solutions
 
 1. **Get a fresh token:**
 
