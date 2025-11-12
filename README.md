@@ -81,7 +81,7 @@ psql --version  # Should show PostgreSQL 18.x or higher
 
 ## Quick start
 
-### 0) After Forking/Cloning (First Time Setup)
+### 1) After Forking/Cloning (First Time Setup)
 
 If you've forked or cloned this template, update these placeholders:
 
@@ -89,7 +89,7 @@ If you've forked or cloned this template, update these placeholders:
 2. **Update CI badge in `README.md`**: Replace `justyn-clark/go-chi-postgres-starter` in the CI badge URL (line 22) with your GitHub username and repo name
 3. **Search and replace**: Use your IDE's find/replace to update `yourusername` → `your-github-username` throughout the codebase
 
-### 1) Clone and setup
+### 2) Clone and setup
 
 ```bash
 git clone https://github.com/justyn-clark/go-chi-postgres-starter.git
@@ -105,7 +105,7 @@ go mod tidy
   * Contains cryptographic hashes (checksums) to verify dependency integrity
   * **Always commit `go.sum` to version control** - it ensures everyone gets the same dependency versions
 
-### 2) Create database
+### 3) Create database
 
 ```bash
 # Create the database using createdb (comes with PostgreSQL)
@@ -120,14 +120,14 @@ psql -d postgres -c "CREATE USER postgres WITH SUPERUSER PASSWORD 'postgres';" 2
 
 **Note:** `createdb` is a PostgreSQL utility command that comes bundled with PostgreSQL installations. If you get a "command not found" error, make sure PostgreSQL 18 is in your PATH (see Prerequisites) or use the `psql` alternative shown above.
 
-### 3) Run migrations
+### 4) Run migrations
 
 ```bash
 export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/go_api_starter?sslmode=disable"
 make migrate-up
 ```
 
-### 4) Start the API
+### 5) Start the API
 
 ```bash
 make run
@@ -378,13 +378,14 @@ Pluggable queue system for background job processing. Supports Redis (production
 **Optional:** [Asynq](https://pkg.go.dev/github.com/hibiken/asynq) implementation available for advanced features (priorities, scheduling, status tracking, dead letter queue, exponential backoff retries, job deduplication, rate limiting). Uses build tags - install with `go get github.com/hibiken/asynq` and build with `-tags asynq`.
 
 **Features:**
-- Interface-based design - plug in any queue (Redis, RabbitMQ, SQS, etc.)
-- Redis implementation included (default)
-- In-memory queue for development/testing
-- Worker pool pattern with configurable concurrency
-- Automatic retry logic
-- Job acknowledgment and rejection
-- **Optional Asynq** - Advanced features when needed (install: `go get github.com/hibiken/asynq`)
+
+* Interface-based design - plug in any queue (Redis, RabbitMQ, SQS, etc.)
+* Redis implementation included (default)
+* In-memory queue for development/testing
+* Worker pool pattern with configurable concurrency
+* Automatic retry logic
+* Job acknowledgment and rejection
+* **Optional Asynq** - Advanced features when needed (install: `go get github.com/hibiken/asynq`)
 
 **Cost:** **FREE** - Uses Redis (free if self-hosted). No additional costs for the queue system itself.
 
@@ -439,6 +440,7 @@ The starter includes production-ready deployment configurations for popular plat
 ### Quick Deploy
 
 **Fly.io:**
+
 ```bash
 fly launch
 fly postgres create
@@ -447,6 +449,7 @@ fly deploy
 ```
 
 **Railway:**
+
 ```bash
 railway init
 railway add postgresql
@@ -458,14 +461,15 @@ railway up
 
 ### Detailed Guides
 
-- **[Deployment Guide](./docs/DEPLOYMENT.md)** - Complete deployment instructions for Fly.io, Railway, and Docker platforms
-- Includes Redis configuration, environment variables, health checks, and troubleshooting
+* **[Deployment Guide](./docs/DEPLOYMENT.md)** - Complete deployment instructions for Fly.io, Railway, and Docker platforms
+* Includes Redis configuration, environment variables, health checks, and troubleshooting
 
 **Key Points:**
-- Dockerfile included (multi-stage build, ~20MB final image)
-- Redis is a **separate service** (not mounted in container)
-- Health check endpoint: `/api/health`
-- Automatic SSL/TLS on Fly.io and Railway
+
+* Dockerfile included (multi-stage build, ~20MB final image)
+* Redis is a **separate service** (not mounted in container)
+* Health check endpoint: `/api/health`
+* Automatic SSL/TLS on Fly.io and Railway
 
 ## Development Commands
 
@@ -514,8 +518,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 **Justyn Clark**
 
-- GitHub: [@justyn-clark](https://github.com/justyn-clark)
-- Email: justyn-clark@users.noreply.github.com
+* GitHub: [@justyn-clark](https://github.com/justyn-clark)
+* Email: <justyn-clark@users.noreply.github.com>
 
 ## License
 
