@@ -12,7 +12,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
-	"github.com/yourusername/go-api-starter/cmd/api/database"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/database"
 )
 
 // @title           Go API Starter
@@ -24,7 +24,9 @@ import (
 // @description     - ✅ JWT Authentication
 // @description     - ✅ Database Migrations
 // @description     - ✅ OpenAPI Documentation
-// @contact.name    API Support
+// @contact.name    Justyn Clark
+// @contact.email   justyn-clark@users.noreply.github.com
+// @contact.url     https://github.com/justyn-clark
 // @host            localhost:8080
 // @BasePath        /api
 // @schemes         http https

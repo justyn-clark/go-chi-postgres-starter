@@ -11,7 +11,7 @@ This API now includes comprehensive authentication features:
 
 ## JWT Token Expiration
 
-**Current Settings:**
+##### Current Settings
 
 - **Expiration**: 7 days (168 hours)
 - **Location**: `cmd/api/services/user_service.go` line 130
@@ -50,7 +50,7 @@ To change the expiration time, edit `cmd/api/services/user_service.go`:
 
 **Endpoint**: `POST /api/auth/request-password-reset`
 
-**Request:**
+##### Request
 
 ```json
 {
@@ -58,7 +58,7 @@ To change the expiration time, edit `cmd/api/services/user_service.go`:
 }
 ```
 
-**Response:**
+##### Response
 
 ```json
 {
@@ -66,7 +66,7 @@ To change the expiration time, edit `cmd/api/services/user_service.go`:
 }
 ```
 
-**What happens:**
+##### What happens
 
 - Generates a secure reset token (UUID)
 - Stores token in database with 1-hour expiration
@@ -88,7 +88,7 @@ To change the expiration time, edit `cmd/api/services/user_service.go`:
 }
 ```
 
-**Response:**
+##### Response
 
 ```json
 {
@@ -96,7 +96,7 @@ To change the expiration time, edit `cmd/api/services/user_service.go`:
 }
 ```
 
-**What happens:**
+##### What happens
 
 - Validates token (must exist and not expired)
 - Hashes new password
@@ -111,7 +111,7 @@ To change the expiration time, edit `cmd/api/services/user_service.go`:
 
 **Headers**: `Authorization: Bearer <jwt-token>`
 
-**Request:**
+##### Request
 
 ```json
 {
@@ -120,7 +120,7 @@ To change the expiration time, edit `cmd/api/services/user_service.go`:
 }
 ```
 
-**Response:**
+##### Response
 
 ```json
 {
@@ -137,13 +137,13 @@ To change the expiration time, edit `cmd/api/services/user_service.go`:
 
 ### Creating an Admin User
 
-**Option 1: Via Database (Direct)**
+##### Option 1: Via Database (Direct)
 
 ```sql
 UPDATE users SET role = 'admin' WHERE email = 'admin@example.com';
 ```
 
-**Option 2: Via API (Requires Admin)**
+##### Option 2: Via API (Requires Admin)
 
 ```bash
 PUT /api/users/{user-id}/role
@@ -267,7 +267,7 @@ curl -X POST http://localhost:8080/api/auth/login \
   -d '{"email": "user@example.com", "password": "password"}'
 ```
 
-2. Use the new token in subsequent requests
+1. Use the new token in subsequent requests
 
 ## Security Best Practices
 

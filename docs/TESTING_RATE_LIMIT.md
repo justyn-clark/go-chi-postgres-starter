@@ -16,7 +16,7 @@ go test ./cmd/api/middleware -v -run TestRateLimit
 go test ./cmd/api/middleware -v -run TestRateLimit -cover
 ```
 
-**What it tests:**
+##### What it tests
 
 - ✅ Requests within burst limit are allowed
 - ✅ Requests exceeding limit return 429
@@ -162,18 +162,18 @@ All requests should succeed regardless of count.
 
 ## Troubleshooting
 
-**Rate limiting not working?**
+##### Rate limiting not working?
 
 - Check that `RATE_LIMIT_ENABLED=true` in your `.env` file
 - Verify the middleware is applied in `routes.go`
 - Check server logs for errors
 
-**429 responses but headers missing?**
+##### 429 responses but headers missing?
 
 - Check that the middleware is correctly setting headers
 - Verify response headers with `curl -I`
 
-**Different IPs sharing limits?**
+##### Different IPs sharing limits?
 
 - Check IP extraction logic in `getClientIP()`
 - Verify `X-Forwarded-For` header handling

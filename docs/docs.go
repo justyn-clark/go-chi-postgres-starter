@@ -37,7 +37,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.LoginRequest"
+                            "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.LoginRequest"
                         }
                     }
                 ],
@@ -45,7 +45,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.LoginResponse"
+                            "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.LoginResponse"
                         }
                     },
                     "401": {
@@ -77,7 +77,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.RegisterRequest"
+                            "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.RegisterRequest"
                         }
                     }
                 ],
@@ -85,7 +85,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.UserResponse"
+                            "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UserResponse"
                         }
                     },
                     "400": {
@@ -120,13 +120,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.HealthResponse"
+                            "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.HealthResponse"
                         }
                     },
                     "503": {
                         "description": "Service unavailable if database is down",
                         "schema": {
-                            "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.HealthResponse"
+                            "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.HealthResponse"
                         }
                     }
                 }
@@ -172,7 +172,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.UserResponse"
+                                "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UserResponse"
                             }
                         }
                     },
@@ -208,7 +208,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.RegisterRequest"
+                            "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.RegisterRequest"
                         }
                     }
                 ],
@@ -216,7 +216,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.UserResponse"
+                            "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UserResponse"
                         }
                     },
                     "400": {
@@ -265,7 +265,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.UserResponse"
+                            "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UserResponse"
                         }
                     },
                     "401": {
@@ -313,7 +313,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.UpdateUserRequest"
+                            "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UpdateUserRequest"
                         }
                     }
                 ],
@@ -321,7 +321,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.UserResponse"
+                            "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UserResponse"
                         }
                     },
                     "400": {
@@ -399,7 +399,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_yourusername_go-api-starter_cmd_api_models.DatabaseHealth": {
+        "github_com_yourusername_go-chi-postgres-starter_cmd_api_models.DatabaseHealth": {
             "type": "object",
             "properties": {
                 "error": {
@@ -413,11 +413,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_yourusername_go-api-starter_cmd_api_models.HealthResponse": {
+        "github_com_yourusername_go-chi-postgres-starter_cmd_api_models.HealthResponse": {
             "type": "object",
             "properties": {
                 "database": {
-                    "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.DatabaseHealth"
+                    "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.DatabaseHealth"
                 },
                 "service": {
                     "type": "string"
@@ -436,7 +436,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_yourusername_go-api-starter_cmd_api_models.LoginRequest": {
+        "github_com_yourusername_go-chi-postgres-starter_cmd_api_models.LoginRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -451,18 +451,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_yourusername_go-api-starter_cmd_api_models.LoginResponse": {
+        "github_com_yourusername_go-chi-postgres-starter_cmd_api_models.LoginResponse": {
             "type": "object",
             "properties": {
                 "token": {
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.User"
+                    "$ref": "#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.User"
                 }
             }
         },
-        "github_com_yourusername_go-api-starter_cmd_api_models.RegisterRequest": {
+        "github_com_yourusername_go-chi-postgres-starter_cmd_api_models.RegisterRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -482,7 +482,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_yourusername_go-api-starter_cmd_api_models.UpdateUserRequest": {
+        "github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UpdateUserRequest": {
             "type": "object",
             "required": [
                 "email",
@@ -497,7 +497,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_yourusername_go-api-starter_cmd_api_models.User": {
+        "github_com_yourusername_go-chi-postgres-starter_cmd_api_models.User": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -517,7 +517,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_yourusername_go-api-starter_cmd_api_models.UserResponse": {
+        "github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UserResponse": {
             "type": "object",
             "properties": {
                 "created_at": {

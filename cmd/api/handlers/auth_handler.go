@@ -6,11 +6,11 @@ import (
 	"net/http"
 
 	"github.com/rs/zerolog/log"
-	"github.com/yourusername/go-api-starter/cmd/api/middleware"
-	"github.com/yourusername/go-api-starter/cmd/api/models"
-	"github.com/yourusername/go-api-starter/cmd/api/repository"
-	"github.com/yourusername/go-api-starter/cmd/api/services"
-	"github.com/yourusername/go-api-starter/cmd/api/utils"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/middleware"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/models"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/repository"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/services"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/utils"
 )
 
 var GetUserID = middleware.GetUserID

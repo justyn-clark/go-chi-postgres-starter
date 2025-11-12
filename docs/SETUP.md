@@ -13,8 +13,8 @@
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/go-api-starter.git
-   cd go-api-starter
+   git clone https://github.com/justyn-clark/go-chi-postgres-starter.git
+   cd go-chi-postgres-starter
    ```
 
 2. **Install Go dependencies**
@@ -33,7 +33,7 @@
 4. **Create database**
 
    ```bash
-   createdb go_api_starter
+   createdb go-chi-postgres-starter
    # Or: psql -c 'CREATE DATABASE go_api_starter;'
    ```
 
@@ -157,13 +157,13 @@ make test-coverage
 
 ```bash
 # Build image
-docker build -t go-api-starter .
+docker build -t go-chi-postgres-starter .
 
 # Run container
 docker run -p 8080:8080 \
   -e DATABASE_URL=postgresql://... \
   -e JWT_SECRET=... \
-  go-api-starter
+  go-chi-postgres-starter
 ```
 
 ## Troubleshooting

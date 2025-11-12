@@ -27,6 +27,9 @@ help:
 	@echo "  make docker-up        - Start Docker services"
 	@echo "  make docker-down      - Stop Docker services"
 	@echo "  make docker-build     - Build Docker image"
+	@echo "  make redis-up         - Start Redis container for queue testing"
+	@echo "  make redis-down       - Stop Redis container"
+	@echo "  make redis-test       - Start Redis and run Redis queue tests"
 	@echo "  make clean            - Clean build artifacts"
 
 # Generate Swagger docs from code annotations
@@ -313,6 +316,26 @@ docker-build:
 	@echo "Building Docker image..."
 	@docker compose build
 	@echo "✅ Docker image built"
+
+# Redis commands for queue testing
+redis-up: ## Start Redis container for queue testing
+	@echo "Starting Redis container..."
+	@docker run -d -p 6379:6379 --name go-chi-postgres-starter-redis redis:7-alpine 2>/dev/null || \
+		docker start go-chi-postgres-starter-redis 2>/dev/null || \
+		echo "Redis container already running or failed to start"
+	@echo "✅ Redis available at redis://localhost:6379"
+	@echo "Test with: go test ./cmd/api/queue -v -run TestRedisQueue"
+
+redis-down: ## Stop Redis container
+	@echo "Stopping Redis container..."
+	@docker stop go-chi-postgres-starter-redis 2>/dev/null || echo "Redis container not running"
+	@docker rm go-chi-postgres-starter-redis 2>/dev/null || echo "Redis container not found"
+
+redis-test: redis-up ## Start Redis and run Redis queue tests
+	@echo "Waiting for Redis to be ready..."
+	@sleep 2
+	@go test ./cmd/api/queue -v -run TestRedisQueue
+	@$(MAKE) redis-down
 
 # Clean build artifacts
 clean:

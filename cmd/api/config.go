@@ -27,6 +27,9 @@ type Config struct {
 	RateLimitEnabled        bool
 	RateLimitRequestsPerSec float64
 	RateLimitBurst          int
+
+	// Queue (optional - for background job processing)
+	QueueURL string // Redis URL or empty for in-memory queue
 }
 
 // LoadConfig loads configuration from environment variables with validation
@@ -60,6 +63,9 @@ func LoadConfig() (*Config, error) {
 	cfg.RateLimitEnabled = getEnv("RATE_LIMIT_ENABLED", "true") == "true"
 	cfg.RateLimitRequestsPerSec = parseFloat(getEnv("RATE_LIMIT_REQUESTS_PER_SEC", "10.0"), 10.0)
 	cfg.RateLimitBurst = parseInt(getEnv("RATE_LIMIT_BURST", "20"), 20)
+
+	// Queue (optional - Redis URL for production, empty for in-memory in development)
+	cfg.QueueURL = getEnv("QUEUE_URL", "")
 
 	return cfg, nil
 }

@@ -16,12 +16,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/yourusername/go-api-starter/cmd/api/database"
-	"github.com/yourusername/go-api-starter/cmd/api/handlers"
-	"github.com/yourusername/go-api-starter/cmd/api/middleware"
-	"github.com/yourusername/go-api-starter/cmd/api/models"
-	"github.com/yourusername/go-api-starter/cmd/api/repository"
-	"github.com/yourusername/go-api-starter/cmd/api/services"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/database"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/handlers"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/middleware"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/models"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/repository"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/services"
 )
 
 // Note: Tests require a test database
@@ -129,7 +129,7 @@ func TestHealthEndpoint(t *testing.T) {
 		err := json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 		assert.Equal(t, "ok", response.Status)
-		assert.Equal(t, "go-api-starter", response.Service)
+		assert.Equal(t, "go-chi-postgres-starter", response.Service)
 		assert.NotEmpty(t, response.Timestamp)
 	})
 }

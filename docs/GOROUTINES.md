@@ -84,25 +84,25 @@ What happens:
 
 ### Why This Matters
 
-**Efficiency:**
+##### Efficiency
 
 - Goroutines are lightweight - you can have **thousands** or even **millions**
 - Each starts at ~2KB (vs. MB for threads)
 - Example: handle 100,000 concurrent connections in one process
 
-**Concurrency:**
+##### Concurrency
 
 - Many goroutines can run concurrently
 - Perfect for I/O-bound operations (APIs, databases, network calls)
 - When one goroutine waits for I/O, Go automatically switches to another
 
-**Simplicity:**
+##### Simplicity
 
 - No need to manage processes or complex IPC
 - Channels provide safe communication
 - `go func()` is all you need
 
-**Perfect for APIs:**
+##### Perfect for APIs
 
 - Each HTTP request can run in its own goroutine
 - Database queries don't block other requests
@@ -150,7 +150,7 @@ This is why Go excels at:
 
 Runs a function in a goroutine with proper error handling. Use for non-blocking operations that don't need to block the HTTP response.
 
-**Use Cases:**
+##### Use Cases
 
 - Sending welcome emails after user registration
 - Logging audit events
@@ -158,7 +158,7 @@ Runs a function in a goroutine with proper error handling. Use for non-blocking 
 - Sending webhooks/notifications
 - Cache invalidation
 
-**Example:**
+##### Example
 
 ```go
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -177,7 +177,7 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 Runs a function with automatic retry logic. Use for operations that must succeed but may fail temporarily.
 
-**Use Cases:**
+##### Use Cases
 
 - Processing payments
 - Sending critical notifications
@@ -185,7 +185,7 @@ Runs a function with automatic retry logic. Use for operations that must succeed
 - Updating external APIs
 - Writing to critical logs
 
-**Example:**
+##### Example
 
 ```go
 // Process payment with retry
@@ -198,7 +198,7 @@ utils.BackgroundTaskWithRetry(r.Context(), func() error {
 
 Processes multiple items concurrently using a worker pool. Perfect for batch operations.
 
-**Use Cases:**
+##### Use Cases
 
 - Processing bulk imports
 - Sending emails to multiple users
@@ -206,7 +206,7 @@ Processes multiple items concurrently using a worker pool. Perfect for batch ope
 - Validating large datasets
 - Bulk database updates
 
-**Example:**
+##### Example
 
 ```go
 func (h *UserHandler) BulkProcessUsers(w http.ResponseWriter, r *http.Request) {
@@ -230,7 +230,7 @@ func (h *UserHandler) BulkProcessUsers(w http.ResponseWriter, r *http.Request) {
 
 Runs a function periodically until context is cancelled. Use for scheduled maintenance tasks.
 
-**Use Cases:**
+##### Use Cases
 
 - Cleaning up expired tokens
 - Generating daily reports
@@ -239,7 +239,7 @@ Runs a function periodically until context is cancelled. Use for scheduled maint
 - Database maintenance
 - Log rotation
 
-**Example:**
+##### Example
 
 ```go
 // In main.go or initialization code
@@ -261,14 +261,14 @@ utils.PeriodicTask(ctx, func() error {
 
 Waits for a WaitGroup to complete with a timeout. Use when coordinating multiple goroutines.
 
-**Use Cases:**
+##### Use Cases
 
 - Waiting for multiple API calls to complete
 - Aggregating data from multiple sources
 - Parallel database queries
 - Batch processing with timeout
 
-**Example:**
+##### Example
 
 ```go
 var wg sync.WaitGroup
@@ -300,14 +300,14 @@ if err := utils.WaitGroupWithTimeout(&wg, 5*time.Second); err != nil {
 
 Distributes work to multiple workers and collects results. Use for parallel processing where you need all results.
 
-**Use Cases:**
+##### Use Cases
 
 - Fetching user data from multiple services
 - Processing and aggregating results
 - Transforming data in parallel
 - Parallel API calls with result collection
 
-**Example:**
+##### Example
 
 ```go
 // Fetch user data from multiple services in parallel

@@ -39,6 +39,8 @@ A clean, minimal Go REST API starter template with:
 * ✅ **Request Body Limits** - 1MB body size limit (DoS protection)
 * ✅ **Prometheus Metrics** - `/metrics` endpoint for observability
 * ✅ **Database Pool Config** - Production-ready connection pool settings
+* ✅ **Queue System** - Pluggable background job processing (Redis/in-memory)
+* ✅ **Deployment Ready** - Dockerfile + Fly.io & Railway configs
 * ✅ **Optional Middleware** - CORS (ready to enable)
 * ✅ **Enhanced Health Checks** - Database status monitoring
 * ✅ **Extensible** - Easy to adapt for GraphQL, gRPC, microservices, CLI tools
@@ -57,8 +59,6 @@ This starter template demonstrates Go's strength: **one language, many solutions
 * **WebSocket Servers** - Real-time connections with goroutines
 
 **Go's Philosophy:** Simple, fast, and versatile. This starter gives you a solid foundation that evolves with your needs while keeping code clean, maintainable, and performant.
-
-For detailed architecture patterns and best practices, see the development documentation in your Obsidian vault.
 
 ## API Documentation
 
@@ -85,14 +85,14 @@ psql --version  # Should show PostgreSQL 18.x or higher
 
 If you've forked or cloned this template, update these placeholders:
 
-1. **Update module name in `go.mod`**: Change `github.com/yourusername/go-api-starter` to your module path
+1. **Update module name in `go.mod`**: Change `github.com/yourusername/go-chi-postgres-starter` to your module path
 2. **Update CI badge in `README.md`**: Replace `justyn-clark/go-chi-postgres-starter` in the CI badge URL (line 22) with your GitHub username and repo name
 3. **Search and replace**: Use your IDE's find/replace to update `yourusername` → `your-github-username` throughout the codebase
 
 ### 1) Clone and setup
 
 ```bash
-git clone https://github.com/yourusername/go-chi-postgres-starter.git
+git clone https://github.com/justyn-clark/go-chi-postgres-starter.git
 cd go-chi-postgres-starter
 go mod tidy
 ```
@@ -279,7 +279,7 @@ This starter includes production-ready utilities ready to use:
 ### Pagination (`cmd/api/utils/pagination.go`)
 
 ```go
-import "github.com/yourusername/go-api-starter/cmd/api/utils"
+import "github.com/yourusername/go-chi-postgres-starter/cmd/api/utils"
 
 // Parse pagination from query params
 params := utils.ParsePagination(r.URL.Query().Get("page"), r.URL.Query().Get("limit"))
@@ -318,7 +318,7 @@ if err != nil {
 ### Custom Error Types (`cmd/api/errors/errors.go`)
 
 ```go
-import "github.com/yourusername/go-api-starter/cmd/api/errors"
+import "github.com/yourusername/go-chi-postgres-starter/cmd/api/errors"
 
 // Use typed API errors
 return errors.WrapAPIError(http.StatusNotFound, "user not found", err)
@@ -335,7 +335,7 @@ if errors.IsAPIError(err) {
 Production-ready patterns for concurrent operations:
 
 ```go
-import "github.com/yourusername/go-api-starter/cmd/api/utils"
+import "github.com/yourusername/go-chi-postgres-starter/cmd/api/utils"
 
 // Fire-and-forget: Send email in background
 utils.BackgroundTask(r.Context(), func() error {
@@ -369,9 +369,103 @@ utils.PeriodicTask(ctx, func() error {
 
 See [Goroutines Guide](./docs/GOROUTINES.md) for complete documentation and examples.
 
+### Queue System (`cmd/api/queue/`)
+
+Pluggable queue system for background job processing. Supports Redis (production) or in-memory (development).
+
+**Default:** Simple Redis Lists (fast, lightweight, no extra dependencies)
+
+**Optional:** [Asynq](https://pkg.go.dev/github.com/hibiken/asynq) implementation available for advanced features (priorities, scheduling, status tracking, dead letter queue, exponential backoff retries, job deduplication, rate limiting). Uses build tags - install with `go get github.com/hibiken/asynq` and build with `-tags asynq`.
+
+**Features:**
+- Interface-based design - plug in any queue (Redis, RabbitMQ, SQS, etc.)
+- Redis implementation included (default)
+- In-memory queue for development/testing
+- Worker pool pattern with configurable concurrency
+- Automatic retry logic
+- Job acknowledgment and rejection
+- **Optional Asynq** - Advanced features when needed (install: `go get github.com/hibiken/asynq`)
+
+**Cost:** **FREE** - Uses Redis (free if self-hosted). No additional costs for the queue system itself.
+
+**Quick Start:**
+
+```go
+import "github.com/yourusername/go-chi-postgres-starter/cmd/api/queue"
+
+// Initialize queue (Redis for production, in-memory for dev)
+var q queue.Queue
+if cfg.QueueURL != "" {
+    q, _ = queue.NewRedisQueue(cfg.QueueURL)
+} else {
+    q = queue.NewMemoryQueue()
+}
+defer q.Close()
+
+// Enqueue a job
+q.Enqueue(ctx, "emails", "send_welcome", EmailJob{
+    To: user.Email,
+    Subject: "Welcome!",
+})
+
+// Start worker
+worker := queue.NewWorker(q, "emails", handleEmailJob, 5)
+worker.Start(ctx)
+```
+
+**Implement Your Own Queue:**
+
+```go
+type MyQueue struct {
+    // Your implementation
+}
+
+func (m *MyQueue) Enqueue(ctx context.Context, queueName string, jobType string, payload any) error {
+    // Your implementation
+}
+// ... implement other Queue interface methods
+```
+
+See `cmd/api/queue/example.go` for complete examples.
+
 ### Optional Middleware (Ready to Enable)
 
 **CORS** (`cmd/api/middleware/cors.go`) - Uncomment in `routes.go` to enable
+
+## Deployment
+
+The starter includes production-ready deployment configurations for popular platforms.
+
+### Quick Deploy
+
+**Fly.io:**
+```bash
+fly launch
+fly postgres create
+fly redis create  # Optional: For queue system (free tier available)
+fly deploy
+```
+
+**Railway:**
+```bash
+railway init
+railway add postgresql
+railway add redis  # Optional: For queue system (free tier available)
+railway up
+```
+
+**Note:** Queue system is optional. If `QUEUE_URL` is not set, the app uses in-memory queue (development only). Redis is free if self-hosted.
+
+### Detailed Guides
+
+- **[Deployment Guide](./docs/DEPLOYMENT.md)** - Complete deployment instructions for Fly.io, Railway, and Docker platforms
+- Includes Redis configuration, environment variables, health checks, and troubleshooting
+
+**Key Points:**
+- Dockerfile included (multi-stage build, ~20MB final image)
+- Redis is a **separate service** (not mounted in container)
+- Health check endpoint: `/api/health`
+- Automatic SSL/TLS on Fly.io and Railway
 
 ## Development Commands
 
@@ -409,15 +503,19 @@ All user management endpoints require authentication.
 * [Goroutines Guide](./docs/GOROUTINES.md) - Concurrent operations and goroutine patterns
 * [Postman Setup Guide](./docs/POSTMAN_SETUP.md) - How to import and use the API in Postman
 * [Postman Get Users Guide](./docs/POSTMAN_GET_USERS.md) - Quick guide for GET /api/users endpoint
+* [Deployment Guide](./docs/DEPLOYMENT.md) - Deploy to Fly.io, Railway, or Docker platforms
 * [Contributing](./CONTRIBUTING.md) - Development guidelines
-
-### Development Documentation (Obsidian)
-
-For detailed development documentation including architecture patterns, database best practices, authentication details, and extending guides, see the **Go** folder in your Obsidian vault under `web dev/Go/`.
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Author
+
+**Justyn Clark**
+
+- GitHub: [@justyn-clark](https://github.com/justyn-clark)
+- Email: justyn-clark@users.noreply.github.com
 
 ## License
 

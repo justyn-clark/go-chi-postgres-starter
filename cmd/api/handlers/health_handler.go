@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/yourusername/go-api-starter/cmd/api/database"
-	"github.com/yourusername/go-api-starter/cmd/api/models"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/database"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/models"
 )
 
 // HealthHandler handles health check requests
@@ -50,7 +50,7 @@ var startTime = time.Now()
 func (h *HealthHandler) Health(w http.ResponseWriter, r *http.Request) {
 	response := models.HealthResponse{
 		Status:    "ok",
-		Service:   "go-api-starter",
+		Service:   "go-chi-postgres-starter",
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 		Uptime:    time.Since(startTime).String(),
 	}

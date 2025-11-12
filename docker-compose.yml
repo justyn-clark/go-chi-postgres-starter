@@ -1,9 +1,9 @@
-name: go-api-starter
+name: go-chi-postgres-starter
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: go-api-starter-postgres
+    container_name: go-chi-postgres-starter-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -18,15 +18,30 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    container_name: go-chi-postgres-starter-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
   api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: go-api-starter-api
+    container_name: go-chi-postgres-starter-api
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/go_api_starter?sslmode=disable
       # Note: When using Docker, the API connects to postgres service on port 5432 (internal)
       # External access to database is on localhost:5434
+      QUEUE_URL: redis://redis:6379  # Redis for queue system (optional - empty for in-memory)
       JWT_SECRET: dev-secret-change-in-production
       PORT: 8080
       ENVIRONMENT: development
@@ -36,10 +51,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     # Note: Run migrations before starting the API
     # docker compose exec api sh -c "migrate -path migrations -database \$DATABASE_URL up"
     command: sh -c "sleep 2 && ./api"
 
 volumes:
   postgres_data:
+  redis_data:
 

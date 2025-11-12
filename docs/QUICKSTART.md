@@ -18,7 +18,7 @@ cd my-go-api
 go mod init github.com/yourusername/my-go-api
 
 # Update all import paths in the codebase
-# Replace "github.com/yourusername/go-api-starter" with your module path
+# Replace "github.com/yourusername/go-chi-postgres-starter" with your module path
 ```
 
 ## Step 2: Install Dependencies

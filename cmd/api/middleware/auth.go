@@ -7,8 +7,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
-	"github.com/yourusername/go-api-starter/cmd/api/models"
-	"github.com/yourusername/go-api-starter/cmd/api/services"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/models"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/services"
 )
 
 type contextKey string

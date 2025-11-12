@@ -9,8 +9,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
-	"github.com/yourusername/go-api-starter/cmd/api/models"
-	"github.com/yourusername/go-api-starter/cmd/api/repository"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/models"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 

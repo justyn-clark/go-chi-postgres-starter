@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
-	"github.com/yourusername/go-api-starter/cmd/api/models"
+	"github.com/yourusername/go-chi-postgres-starter/cmd/api/models"
 )
 
 // Error messages

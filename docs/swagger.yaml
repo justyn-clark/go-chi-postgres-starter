@@ -5,7 +5,7 @@ definitions:
       error:
         type: string
     type: object
-  github_com_yourusername_go-api-starter_cmd_api_models.DatabaseHealth:
+  github_com_yourusername_go-chi-postgres-starter_cmd_api_models.DatabaseHealth:
     properties:
       error:
         type: string
@@ -14,10 +14,10 @@ definitions:
       status:
         type: string
     type: object
-  github_com_yourusername_go-api-starter_cmd_api_models.HealthResponse:
+  github_com_yourusername_go-chi-postgres-starter_cmd_api_models.HealthResponse:
     properties:
       database:
-        $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.DatabaseHealth'
+        $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.DatabaseHealth'
       service:
         type: string
       status:
@@ -29,7 +29,7 @@ definitions:
       version:
         type: string
     type: object
-  github_com_yourusername_go-api-starter_cmd_api_models.LoginRequest:
+  github_com_yourusername_go-chi-postgres-starter_cmd_api_models.LoginRequest:
     properties:
       email:
         type: string
@@ -39,14 +39,14 @@ definitions:
     - email
     - password
     type: object
-  github_com_yourusername_go-api-starter_cmd_api_models.LoginResponse:
+  github_com_yourusername_go-chi-postgres-starter_cmd_api_models.LoginResponse:
     properties:
       token:
         type: string
       user:
-        $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.User'
+        $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.User'
     type: object
-  github_com_yourusername_go-api-starter_cmd_api_models.RegisterRequest:
+  github_com_yourusername_go-chi-postgres-starter_cmd_api_models.RegisterRequest:
     properties:
       email:
         type: string
@@ -60,7 +60,7 @@ definitions:
     - full_name
     - password
     type: object
-  github_com_yourusername_go-api-starter_cmd_api_models.UpdateUserRequest:
+  github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UpdateUserRequest:
     properties:
       email:
         type: string
@@ -70,7 +70,7 @@ definitions:
     - email
     - full_name
     type: object
-  github_com_yourusername_go-api-starter_cmd_api_models.User:
+  github_com_yourusername_go-chi-postgres-starter_cmd_api_models.User:
     properties:
       created_at:
         type: string
@@ -83,7 +83,7 @@ definitions:
       updated_at:
         type: string
     type: object
-  github_com_yourusername_go-api-starter_cmd_api_models.UserResponse:
+  github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UserResponse:
     properties:
       created_at:
         type: string
@@ -122,14 +122,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.LoginRequest'
+          $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.LoginResponse'
+            $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.LoginResponse'
         "401":
           description: Unauthorized
           schema:
@@ -148,14 +148,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.RegisterRequest'
+          $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.RegisterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.UserResponse'
+            $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UserResponse'
         "400":
           description: Bad Request
           schema:
@@ -178,11 +178,11 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.HealthResponse'
+            $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.HealthResponse'
         "503":
           description: Service unavailable if database is down
           schema:
-            $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.HealthResponse'
+            $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.HealthResponse'
       summary: Health check
       tags:
       - Health
@@ -209,7 +209,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.UserResponse'
+              $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UserResponse'
             type: array
         "401":
           description: Unauthorized
@@ -230,14 +230,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.RegisterRequest'
+          $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.RegisterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.UserResponse'
+            $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UserResponse'
         "400":
           description: Bad Request
           schema:
@@ -296,7 +296,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.UserResponse'
+            $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UserResponse'
         "401":
           description: Unauthorized
           schema:
@@ -325,14 +325,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.UpdateUserRequest'
+          $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UpdateUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/github_com_yourusername_go-api-starter_cmd_api_models.UserResponse'
+            $ref: '#/definitions/github_com_yourusername_go-chi-postgres-starter_cmd_api_models.UserResponse'
         "400":
           description: Bad Request
           schema:

@@ -7,8 +7,8 @@ Thank you for considering contributing to this Go API Starter template!
 1. **Fork and clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/go-api-starter.git
-   cd go-api-starter
+   git clone https://github.com/yourusername/go-chi-postgres-starter.git
+   cd go-chi-postgres-starter
    ```
 
 2. **Install dependencies**
