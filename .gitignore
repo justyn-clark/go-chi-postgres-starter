@@ -100,3 +100,13 @@ api.exe
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# JCN universal secrets policy
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+!.env.*.example
+!.env.*.sample
+!.env.*.template
