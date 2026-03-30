@@ -2,168 +2,174 @@
 
 ## Prerequisites
 
-- **Go 1.25+** - [Install Go](https://golang.org/doc/install)
-- **PostgreSQL 16+** - [Install PostgreSQL](https://www.postgresql.org/download/)
-- **Docker & Docker Compose** (optional, for containerized development)
+- **Go 1.25+**
+- **PostgreSQL** for local development
+- **Docker** (optional)
 
-## Quick Start
+> The repo docs recommend PostgreSQL 18 for local development, but the checked-in Docker Compose file and GitHub Actions workflow currently use PostgreSQL 16.
 
-### Option 1: Local Development
+## Option 1: Local development
 
-1. **Clone the repository**
+### 1. Clone the repository
 
-   ```bash
-   git clone https://github.com/justyn-clark/go-chi-postgres-starter.git
-   cd go-chi-postgres-starter
-   ```
+```bash
+git clone https://github.com/justyn-clark/go-chi-postgres-starter.git
+cd go-chi-postgres-starter
+```
 
-2. **Install Go dependencies**
+### 2. Install dependencies
 
-   ```bash
-   go mod tidy
-   ```
+```bash
+go mod tidy
+```
 
-3. **Set up environment variables**
+### 3. Set up environment variables
 
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+```bash
+cp .env.example .env
+```
 
-4. **Create database**
+Update `.env` as needed.
 
-   ```bash
-   createdb go-chi-postgres-starter
-   # Or: psql -c 'CREATE DATABASE go_api_starter;'
-   ```
+### 4. Create the database
 
-5. **Install migration tool**
+```bash
+createdb go_api_starter
+```
 
-   ```bash
-   go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-   ```
+Or:
 
-6. **Run migrations**
+```bash
+psql -d postgres -c 'CREATE DATABASE go_api_starter;'
+```
 
-   ```bash
-   export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/go_api_starter?sslmode=disable"
-   make migrate-up
-   ```
+### 5. Install migrate
 
-7. **Start the server**
+```bash
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+```
 
-   ```bash
-   make run
-   ```
+### 6. Run migrations
 
-8. **Access the API**
-   - API: <http://localhost:8080>
-   - Swagger UI: <http://localhost:8080/swagger/index.html>
+```bash
+export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/go_api_starter?sslmode=disable"
+make migrate-up
+```
 
-### Option 2: Docker Development
+### 7. Start the server
 
-1. **Start services**
+```bash
+make run
+```
 
-   ```bash
-   docker compose up -d --build
-   ```
+### 8. Access the app
 
-2. **Run migrations** (first time only)
+- API: <http://localhost:8080>
+- Health: <http://localhost:8080/api/health>
+- Swagger UI: <http://localhost:8080/swagger/index.html>
+- Metrics: <http://localhost:8080/metrics>
 
-   ```bash
-   docker compose exec api sh -c "migrate -path migrations -database \$DATABASE_URL up"
-   ```
+## Option 2: Docker development
 
-3. **Access the API**
-   - API: <http://localhost:8080>
-   - Swagger UI: <http://localhost:8080/swagger/index.html>
+### Start services
 
-## Generate JWT Secret
+```bash
+docker compose up -d --build
+```
 
-For production, generate a secure JWT secret:
+This starts:
+
+- API on `localhost:8080`
+- Postgres on `localhost:5434`
+- Redis on `localhost:6379`
+
+### Database URL from your host shell
+
+```bash
+export DATABASE_URL="postgresql://postgres:postgres@localhost:5434/go_api_starter?sslmode=disable"
+```
+
+### Migrations with Docker
+
+The Compose setup does **not** automatically run migrations for you.
+
+Recommended approach:
+
+```bash
+go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+export DATABASE_URL="postgresql://postgres:postgres@localhost:5434/go_api_starter?sslmode=disable"
+make migrate-up
+```
+
+## JWT secret
+
+Generate one for non-default usage:
 
 ```bash
 openssl rand -base64 32
 ```
 
-Add it to your `.env` file:
+Add it to `.env`:
 
 ```text
 JWT_SECRET=your-generated-secret-here
 ```
 
-## Database Migrations
+## Authorization model
 
-### Create a new migration
+Current route protection in `cmd/api/routes.go`:
 
-```bash
-make migrate-create NAME=add_user_table
-```
+### Public
 
-This creates two files:
+- `GET /api/health`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/request-password-reset`
+- `POST /api/auth/reset-password`
 
-- `migrations/XXXXXX_add_user_table.up.sql` - Migration to apply
-- `migrations/XXXXXX_add_user_table.down.sql` - Migration to rollback
+### Authenticated
 
-### Run migrations
+- `POST /api/auth/change-password`
+- `GET /api/users/me`
 
-```bash
-make migrate-up
-```
+### Owner or admin
 
-### Rollback last migration
+- `GET /api/users/{id}`
+- `PUT /api/users/{id}`
 
-```bash
-make migrate-down
-```
+### Admin only
 
-### Check migration status
+- `GET /api/users`
+- `POST /api/users`
+- `DELETE /api/users/{id}`
+- `PUT /api/users/{id}/role`
 
-```bash
-make migrate-status
-```
-
-## Generate Swagger Documentation
+## Swagger generation
 
 ```bash
 make swagger
 ```
 
-This generates OpenAPI documentation from code annotations. Visit <http://localhost:8080/swagger/index.html> after starting the server.
+Then visit <http://localhost:8080/swagger/index.html>.
 
 ## Testing
 
 ```bash
-# Run all tests
 make test
-
-# Run tests with coverage
 make test-coverage
 ```
 
-## Production Deployment
-
-### Railway
-
-1. Connect your GitHub repository
-2. Add PostgreSQL service
-3. Set environment variables:
-   - `DATABASE_URL` (auto-provided by Railway)
-   - `JWT_SECRET` (generate with `openssl rand -base64 32`)
-   - `ENVIRONMENT=production`
-4. Deploy!
-
-### Docker
+## Helpful dev commands
 
 ```bash
-# Build image
-docker build -t go-chi-postgres-starter .
-
-# Run container
-docker run -p 8080:8080 \
-  -e DATABASE_URL=postgresql://... \
-  -e JWT_SECRET=... \
-  go-chi-postgres-starter
+make run
+make run-dev
+make dev
+make stop
+make fmt
+make vet
+make lint
+make migrate-status
 ```
 
 ## Troubleshooting
@@ -171,16 +177,15 @@ docker run -p 8080:8080 \
 ### Database connection issues
 
 - Ensure PostgreSQL is running
-- Check `DATABASE_URL` format: `postgresql://user:password@host:port/dbname?sslmode=disable`
-- Verify database exists: `psql -l`
+- Check `DATABASE_URL`
+- Verify the target database exists
 
-### Migration errors
+### Port 8080 already in use
 
-- Ensure migrations are in correct order
-- Check database connection
-- Verify migration files are valid SQL
+- Stop the conflicting process
+- Or run `make stop`
 
-### Port already in use
+### Docker DB vs local DB mismatch
 
-- Change `PORT` in `.env` file
-- Or stop the process using port 8080
+- Local Postgres examples use port `5432`
+- Docker Postgres is exposed on host port `5434`

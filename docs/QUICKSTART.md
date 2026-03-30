@@ -1,106 +1,132 @@
 # Quick Start Guide
 
-Get your Go API up and running in 5 minutes!
+Get the starter running locally with the current route and auth model.
 
 ## Prerequisites
 
-- Go 1.25+ installed
-- PostgreSQL 18+ (recommended) or use Docker
+- Go 1.25+
+- PostgreSQL installed locally, or Docker
+- git
 
-## Step 1: Setup
+> Local docs in this repo recommend PostgreSQL 18. The checked-in Docker Compose and CI workflows currently use PostgreSQL 16.
+
+## 1. Clone the repo
 
 ```bash
-# Copy starter to your new project
-cp -r starter my-go-api
-cd my-go-api
-
-# Initialize Go module (update with your module path)
-go mod init github.com/yourusername/my-go-api
-
-# Update all import paths in the codebase
-# Replace "github.com/yourusername/go-chi-postgres-starter" with your module path
+git clone https://github.com/justyn-clark/go-chi-postgres-starter.git
+cd go-chi-postgres-starter
 ```
 
-## Step 2: Install Dependencies
+## 2. Install dependencies
 
 ```bash
 go mod tidy
 ```
 
-## Step 3: Configure Environment
+## 3. Configure environment
 
 ```bash
-# Copy example env file
 cp .env.example .env
-
-# Edit .env and set:
-# - DATABASE_URL (your PostgreSQL connection string)
-# - JWT_SECRET (generate with: openssl rand -base64 32)
 ```
 
-## Step 4: Setup Database
+Minimum local settings:
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/go_api_starter?sslmode=disable
+JWT_SECRET=dev-secret-change-in-production
+PORT=8080
+ENVIRONMENT=development
+LOG_LEVEL=info
+```
+
+Generate a real JWT secret if needed:
 
 ```bash
-# Create database
+openssl rand -base64 32
+```
+
+## 4. Create the database
+
+```bash
 createdb go_api_starter
+```
 
-# Install migration tool
+Or:
+
+```bash
+psql -d postgres -c 'CREATE DATABASE go_api_starter;'
+```
+
+## 5. Install migrate and run migrations
+
+```bash
 go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-
-# Run migrations
 export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/go_api_starter?sslmode=disable"
 make migrate-up
 ```
 
-## Step 5: Run the API
+## 6. Start the API
 
 ```bash
 make run
 ```
 
-## Step 6: Test the API
+## 7. Verify the server
 
 ```bash
-# Health check
 curl http://localhost:8080/api/health
+```
 
-# Register a user
+## 8. Register and log in
+
+Register:
+
+```bash
 curl -X POST http://localhost:8080/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password123","full_name":"John Doe"}'
+```
 
-# Login
+Login:
+
+```bash
 curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password123"}'
+```
 
-# Use the token from login response
-curl http://localhost:8080/api/users \
+## 9. Call an authenticated endpoint
+
+Use the token from login against your own profile endpoint:
+
+```bash
+curl http://localhost:8080/api/users/me \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
-## View API Documentation
+> `GET /api/users` is admin-only in the current codebase, so a freshly registered normal user should use `/api/users/me` or `/api/users/{their-id}`.
 
-Open <http://localhost:8080/swagger/index.html> in your browser.
+## Swagger and metrics
 
-## Using Docker Instead
+- Swagger UI: <http://localhost:8080/swagger/index.html>
+- Metrics: <http://localhost:8080/metrics>
 
-> **Note:** For local development, using PostgreSQL 18 directly is recommended. Docker is available as an alternative.
+## Docker option
 
 ```bash
-# Start everything with Docker
 docker compose up -d --build
-
-# Run migrations (first time)
-docker compose exec api sh -c "migrate -path migrations -database \$DATABASE_URL up"
 ```
 
-**Note:** Docker PostgreSQL runs on port 5434 to avoid conflict with local PostgreSQL 18.
+When using the Docker Postgres service from your host shell, use:
 
-That's it! Your API is running. 🚀
+```bash
+export DATABASE_URL="postgresql://postgres:postgres@localhost:5434/go_api_starter?sslmode=disable"
+```
 
-## Next Steps
+If you need migrations after the stack is up, run them from a host shell with that `DATABASE_URL`, or install `migrate` in the API image yourself before using in-container commands.
 
-- Read [Architecture](./ARCHITECTURE.md) to understand the codebase
-- Read [Setup Guide](./SETUP.md) for detailed setup instructions
-- Check [Contributing](../CONTRIBUTING.md) for development guidelines
+## Next steps
+
+- [Setup Guide](./SETUP.md)
+- [Authentication Guide](./AUTHENTICATION.md)
+- [Testing Guide](./TESTING.md)

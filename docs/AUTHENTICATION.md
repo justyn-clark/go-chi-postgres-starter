@@ -1,56 +1,99 @@
-# Authentication & User Management Guide
+# Authentication & Authorization Guide
+
+This guide reflects the current auth flow and route protections in the codebase.
 
 ## Overview
 
-This API now includes comprehensive authentication features:
+The API currently includes:
 
-- **Password Reset** - Users can reset forgotten passwords
-- **Admin Roles** - Role-based access control
-- **JWT Token Management** - 7-day expiration with role-based claims
-- **Password Change** - Logged-in users can change their passwords
+- JWT login and authenticated requests
+- Role-aware authorization (`user` and `admin`)
+- Password reset request flow
+- Password reset confirmation flow
+- Authenticated password change flow
+- Optional `API_ACCESS_TOKEN` header support for some service-to-service requests
 
-## JWT Token Expiration
+## JWT token behavior
 
-##### Current Settings
+JWTs are generated in `cmd/api/services/user_service.go` and include:
 
-- **Expiration**: 7 days (168 hours)
-- **Location**: `cmd/api/services/user_service.go` line 130
-- **Token includes**: `user_id`, `email`, `role`, `exp`, `iat`
+- `user_id`
+- `email`
+- `role`
+- `exp`
+- `iat`
 
-### How Token Expiration Works
+Current expiration is **7 days**.
 
-1. **Token Generation**: When a user logs in, a JWT is created with:
-   - `exp`: Expiration timestamp (7 days from now)
-   - `iat`: Issued at timestamp
+If you change expiration behavior, update `generateToken` in `cmd/api/services/user_service.go`.
 
-2. **Token Validation**: The middleware automatically checks:
-   - Token signature (using JWT_SECRET)
-   - Expiration time
-   - Token format
+## Public auth endpoints
 
-3. **Expired Tokens**: When a token expires:
-   - API returns `401 Unauthorized` with "invalid or expired token"
-   - User must login again to get a new token
+These routes do not require prior authentication:
 
-### Changing Token Expiration
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/request-password-reset`
+- `POST /api/auth/reset-password`
 
-To change the expiration time, edit `cmd/api/services/user_service.go`:
+## Protected auth endpoint
 
-```go
-"exp": time.Now().Add(time.Hour * 24 * 7).Unix(), // 7 days
-// Change to:
-"exp": time.Now().Add(time.Hour * 24).Unix(), // 1 day
-// Or:
-"exp": time.Now().Add(time.Hour * 24 * 30).Unix(), // 30 days
+Requires JWT Bearer auth:
+
+- `POST /api/auth/change-password`
+
+## User and admin authorization model
+
+### Authenticated user
+
+- `GET /api/users/me`
+
+### Owner or admin
+
+- `GET /api/users/{id}`
+- `PUT /api/users/{id}`
+
+### Admin only
+
+- `GET /api/users`
+- `POST /api/users`
+- `DELETE /api/users/{id}`
+- `PUT /api/users/{id}/role`
+
+A newly registered user gets the default `user` role.
+
+## Login flow
+
+### Request
+
+`POST /api/auth/login`
+
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
 ```
 
-## Password Reset Flow
+### Response
 
-### 1. Request Password Reset
+```json
+{
+  "token": "<jwt>",
+  "user": {
+    "id": "...",
+    "email": "user@example.com",
+    "full_name": "User Example",
+    "role": "user"
+  }
+}
+```
 
-**Endpoint**: `POST /api/auth/request-password-reset`
+## Password reset flow
 
-##### Request
+### 1. Request password reset
+
+`POST /api/auth/request-password-reset`
 
 ```json
 {
@@ -58,7 +101,7 @@ To change the expiration time, edit `cmd/api/services/user_service.go`:
 }
 ```
 
-##### Response
+Response:
 
 ```json
 {
@@ -66,29 +109,24 @@ To change the expiration time, edit `cmd/api/services/user_service.go`:
 }
 ```
 
-##### What happens
+Notes:
 
-- Generates a secure reset token (UUID)
-- Stores token in database with 1-hour expiration
-- **Currently**: Token is printed to console/logs
-- **Production**: Should send email with reset link
+- The handler always returns success-style messaging to reduce email enumeration risk.
+- The current service implementation stores reset state in the database.
+- The current implementation prints a localhost reset link to server output rather than sending email.
 
-**Security Note**: Always returns success (even if email doesn't exist) to prevent email enumeration attacks.
+### 2. Reset password with token
 
-### 2. Reset Password
-
-**Endpoint**: `POST /api/auth/reset-password`
-
-**Request:**
+`POST /api/auth/reset-password`
 
 ```json
 {
-  "token": "reset-token-from-email",
+  "token": "reset-token",
   "password": "newSecurePassword123"
 }
 ```
 
-##### Response
+Response:
 
 ```json
 {
@@ -96,22 +134,17 @@ To change the expiration time, edit `cmd/api/services/user_service.go`:
 }
 ```
 
-##### What happens
+## Change password for authenticated users
 
-- Validates token (must exist and not expired)
-- Hashes new password
-- Updates user password
-- Clears reset token
+`POST /api/auth/change-password`
 
-**Token Expiration**: Reset tokens expire after 1 hour
+Header:
 
-## Change Password (Logged-in Users)
+```text
+Authorization: Bearer <jwt>
+```
 
-**Endpoint**: `POST /api/auth/change-password`
-
-**Headers**: `Authorization: Bearer <jwt-token>`
-
-##### Request
+Request:
 
 ```json
 {
@@ -120,183 +153,75 @@ To change the expiration time, edit `cmd/api/services/user_service.go`:
 }
 ```
 
-##### Response
+## API access token
 
-```json
-{
-  "message": "Password has been changed successfully"
-}
+If `API_ACCESS_TOKEN` is set, the JWT middleware also accepts:
+
+```text
+X-API-Token: <token>
 ```
 
-## Admin Roles
+Important behavior:
 
-### User Roles
+- This bypasses the login/JWT requirement for middleware-protected routes.
+- It does **not** populate a user role.
+- Because of that, it does **not** satisfy admin-only authorization checks.
 
-- **`user`** (default): Regular user
-- **`admin`**: Administrator with elevated privileges
+So `X-API-Token` may be useful for non-admin protected requests, but it will not grant access to routes guarded by `RequireAdmin`.
 
-### Creating an Admin User
+## Making a user admin
 
-##### Option 1: Via Database (Direct)
+The repo supports admin roles. A direct SQL update is the simplest current path:
 
 ```sql
 UPDATE users SET role = 'admin' WHERE email = 'admin@example.com';
 ```
 
-##### Option 2: Via API (Requires Admin)
+After that, log in again so the new JWT includes the updated role claim.
 
-```bash
-PUT /api/users/{user-id}/role
-Authorization: Bearer <admin-jwt-token>
-Content-Type: application/json
+## Required migration state
 
-{
-  "role": "admin"
-}
-```
+The current auth model depends on both checked-in migrations:
 
-### Admin-Only Endpoints
+- `001_initial_schema`
+- `002_add_roles_and_password_reset`
 
-- `PUT /api/users/{id}/role` - Update user role (admin only)
-
-### Checking User Role
-
-The JWT token includes the user's role. After login, check the `role` field in the token claims.
-
-## Migration Required
-
-**⚠️ IMPORTANT**: Run the migration to add role and password reset fields:
+Run them with:
 
 ```bash
 make migrate-up
 ```
 
-Or manually:
+## Quick examples
+
+### Register
 
 ```bash
-migrate -path migrations -database "$DATABASE_URL" up
-```
-
-This will:
-
-- Add `role` column (default: 'user')
-- Add `password_reset_token` column
-- Add `password_reset_expires_at` column
-- Create indexes for performance
-
-## API Endpoints Summary
-
-### Public Endpoints (No Auth)
-
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login and get JWT
-- `POST /api/auth/request-password-reset` - Request password reset
-- `POST /api/auth/reset-password` - Reset password with token
-
-### Protected Endpoints (Require JWT)
-
-- `POST /api/auth/change-password` - Change password (logged-in users)
-- `GET /api/users` - List users
-- `POST /api/users` - Create user
-- `GET /api/users/{id}` - Get user
-- `PUT /api/users/{id}` - Update user
-- `DELETE /api/users/{id}` - Delete user
-
-### Admin-Only Endpoints (Require Admin Role)
-
-- `PUT /api/users/{id}/role` - Update user role
-
-## Example Workflows
-
-### Forgot Password Workflow
-
-1. User requests reset:
-
-```bash
-curl -X POST http://localhost:8080/api/auth/request-password-reset \
+curl -X POST http://localhost:8080/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com"}'
+  -d '{"email":"user@example.com","full_name":"Test User","password":"password123"}'
 ```
 
-2. Check server logs for reset token (or email in production)
-
-3. User resets password:
-
-```bash
-curl -X POST http://localhost:8080/api/auth/reset-password \
-  -H "Content-Type: application/json" \
-  -d '{
-    "token": "token-from-logs",
-    "password": "newPassword123"
-  }'
-```
-
-4. User logs in with new password:
+### Login
 
 ```bash
 curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "newPassword123"
-  }'
+  -d '{"email":"user@example.com","password":"password123"}'
 ```
 
-### Making a User Admin
-
-1. Login as existing admin (or create one via database)
-
-2. Update user role:
+### Get your own profile
 
 ```bash
-curl -X PUT http://localhost:8080/api/users/{user-id}/role \
-  -H "Authorization: Bearer <admin-token>" \
-  -H "Content-Type: application/json" \
-  -d '{"role": "admin"}'
+curl -X GET http://localhost:8080/api/users/me \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
-### Token Expired? Login Again
-
-When you get `401 Unauthorized` with "invalid or expired token":
-
-1. Login again:
+### Promote a user to admin
 
 ```bash
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X PUT http://localhost:8080/api/users/USER_ID/role \
+  -H "Authorization: Bearer ADMIN_JWT_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "password": "password"}'
+  -d '{"role":"admin"}'
 ```
-
-1. Use the new token in subsequent requests
-
-## Security Best Practices
-
-1. **Password Reset Tokens**:
-   - Expire after 1 hour
-   - Single-use (cleared after password reset)
-   - Secure UUID generation
-
-2. **JWT Tokens**:
-   - Include role for authorization
-   - 7-day expiration (adjustable)
-   - Signed with JWT_SECRET
-
-3. **Email Enumeration Prevention**:
-   - Password reset always returns success
-   - Doesn't reveal if email exists
-
-4. **Role-Based Access**:
-   - Admin middleware protects sensitive endpoints
-   - Role checked from JWT token
-
-## Production Considerations
-
-1. **Email Service**: Implement email sending for password reset (currently logs to console)
-
-2. **Token Refresh**: Consider implementing refresh tokens for better UX
-
-3. **Rate Limiting**: Add rate limiting to password reset endpoints
-
-4. **Audit Logging**: Log admin actions (role changes, etc.)
-
-5. **Password Policy**: Consider adding password complexity requirements

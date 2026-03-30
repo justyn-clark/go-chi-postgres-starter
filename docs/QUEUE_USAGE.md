@@ -1,14 +1,15 @@
 # Queue System - Quick Usage Guide
 
-The queue system is **fully functional** and ready to use! Here's how to test and integrate it.
+The queue packages in this repo are real and testable, but they are only **partially integrated** at the application level.
 
 ## ✅ Current Status
 
-- ✅ Queue system is implemented and tested
-- ✅ Redis and in-memory implementations available
-- ✅ Worker pool system ready
-- ✅ All tests passing
-- ⚠️ **Not yet integrated into main application** (you need to add it)
+- ✅ Queue system packages are implemented
+- ✅ Redis and in-memory implementations are available
+- ✅ Worker pool support exists
+- ✅ Queue helper CLIs are present in the repo
+- ⚠️ **The main API server does not currently initialize the queue or mount queue admin routes**
+- ⚠️ This guide is therefore an integration guide, not a description of behavior already enabled by default
 
 ## 🧪 Quick Testing
 
